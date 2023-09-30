@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Automatización de Cédulas</title>
+</head>
+<body>
+    <h1>Automatización de Cédulas</h1>
+    
+    <label for="proyecto">Selecciona un proyecto:</label>
+    <select id="proyecto">
+        <option value="proyecto1">Proyecto 1</option>
+        <option value="proyecto2">Proyecto 2</option>
+        <option value="proyecto3">Proyecto 3</option>
+    </select>
+    
+    <label for="cedulas">Ingresa las cédulas (separadas por comas):</label>
+    <input type="text" id="cedulas">
+    
+    <button id="enviar">Enviar</button>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/playwright/1.19.0/playwright.min.js"></script>
+    <script>
+        
+        document.getElementById('enviar').addEventListener('click', async () => {
+            const proyecto = document.getElementById('proyecto').value;
+            const cedulasStr = document.getElementById('cedulas').value;
+            const cedulasArray = cedulasStr.split(',').map(cedula => cedula.trim());
+
+            const resultArray = [];
+
+            // Iterar sobre las cédulas y procesar cada una
+            for (const cedula of cedulasArray) {
+                const browser = await playwright.chromium.launch();
+                const page = await browser.newPage();
+                
+                // Navegar a la página web
+                await page.goto('https://subsidiosfonvivienda.minvivienda.gov.co/micasaya/');
+                
+                // Seleccionar proyecto
+                await page.selectOption('select[name="tipo_documento"]', proyecto);
+                
+                // Ingresar cédula
+                await page.fill('input[name="numero_documento"]', cedula);
+                
+                // Hacer clic en el botón de búsqueda
+                await page.click('.btn-buscar');
+                
+                // Esperar a que aparezca la tabla de resultados
+                await page.waitForSelector('.table-responsive');
+                
+                // Obtener el contenido de la tabla
+                const tablaContenido = await page.$eval('.table-responsive', (div) => div.textContent);
+                
+                // Agregar el resultado al array
+                resultArray.push({ cedula, resultado: tablaContenido });
+                
+                // Cerrar el navegador
+                await browser.close();
+            }
+
+            // Generar un archivo de texto con los resultados
+            const textContent = resultArray.map(item => `Cédula: ${item.cedula}\n${item.resultado}\n`).join('\n');
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            // Crear un enlace para descargar el archivo
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resultados.txt';
+            a.click();
+        });
+    </script>
+</body>
+</html>
