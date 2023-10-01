@@ -6,19 +6,7 @@
     <title>Document</title>
 </head>
 <body>
-    <button id="ejecutarBoton">Ejecutar Comando</button>
-
-    <script>
-        const ejecutarBoton = document.getElementById("ejecutarBoton");
-
-        ejecutarBoton.addEventListener("click", () => {
-            // Usamos la función execCommand para ejecutar el comando Node.js
-            // Cambia "node Consultar.js" por tu comando real si es diferente
-            const comando = "node ConsultarMicasaYa.js";
-
-            // Ejecutamos el comando en una ventana emergente (puede requerir permisos)
-            window.open(`data:text/html,${encodeURIComponent(`<script>${comando}</script>`)}`);
-        });
-    </script>
+    
+    
 </body>
 </html>
