@@ -16,5 +16,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "node": "18.17"
 }
