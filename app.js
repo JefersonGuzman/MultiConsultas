@@ -8,7 +8,6 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 
-
 // Configuración de EJS como motor de plantillas
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
