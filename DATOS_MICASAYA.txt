@@ -1,0 +1,1 @@
+Estado;ID del hogar;Tipo de documento de identificación;Documento de identificación;Nombres y apellidos;Entidad;Fecha de postulación;Clasificación de Sisbén IV*;Resolución de asignación

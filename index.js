@@ -6,6 +6,7 @@ const fse = require('fs-extra');
 
 const { chromium } = require('playwright');
 
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -14,8 +15,8 @@ const port = process.env.PORT || 3000;
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
-const filePath = './uploads/archivo.txt';
 
+const filePath = './uploads/archivo.txt';
 
 
 // Configuración de Multer para subir archivos
@@ -37,6 +38,13 @@ try {
 
   
 const upload = multer({ storage: storage });
+
+// Ruta para mostrar el formulario para Micasaya
+app.get('/', (req, res) => {
+    res.render('index');
+});
+
+
 
 // Ruta para mostrar el formulario para Micasaya
 app.get('/micasaya', (req, res) => {
