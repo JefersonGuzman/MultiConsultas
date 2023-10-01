@@ -2,6 +2,8 @@ const express = require('express');
 const ejs = require('ejs');
 const multer = require('multer');
 const fs = require('fs');
+const fse = require('fs-extra'); 
+
 const { chromium } = require('playwright');
 
 const app = express();
@@ -12,16 +14,28 @@ const port = process.env.PORT || 3000;
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
+const filePath = './uploads/archivo.txt';
+
+
+
 // Configuración de Multer para subir archivos
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, __dirname + '/uploads');
     },
     filename: (req, file, cb) => {
-        cb(null, 'archivo.txt'); // Cambiar a 'cedulas_v1.txt' o 'cedulas_v2.txt' según corresponda
+        cb(null, 'archivo.txt'); 
     }
 });
 
+try {
+    fs.chmodSync(filePath, '0666');
+    console.log('Se han concedido permisos de escritura al archivo.');
+  } catch (error) {
+    console.error('Error al conceder permisos de escritura:', error);
+  }
+
+  
 const upload = multer({ storage: storage });
 
 // Ruta para mostrar el formulario para Micasaya
@@ -32,8 +46,16 @@ app.get('/micasaya', (req, res) => {
 // Ruta para procesar el archivo para Micasaya
 app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
     try {
+
+        // Establece el nombre del archivo a 'archivo.txt'
+        const fileName = 'archivo.txt';
+        const filePath = __dirname + '/uploads/' + fileName;
+
+        // Mueve el archivo subido al nuevo nombre
+        fs.renameSync(req.file.path, filePath);
+
         // Lee las cédulas y tipos de documento desde el archivo subido
-        const lines = fs.readFileSync(__dirname + '/uploads/archivo.txt', 'utf-8').split('\n');
+        const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
         const cedulas = lines.map((line) => {
             const [tipoDocumento, cedula] = line.trim().split(';');
             return { tipoDocumento, cedula };
@@ -96,6 +118,8 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
         // Cierra el navegador
         await browser.close();
 
+
+
         // Genera un enlace de descarga del archivo procesado
         const fileLink = '/micasaya/descargar';
         res.send(`Archivo procesado correctamente para Micasaya. <a href="${fileLink}" download>Descargar archivo</a>`);
@@ -110,6 +134,13 @@ app.get('/micasaya/descargar', (req, res) => {
     res.download(file, 'DATOS_MICASAYA.txt', (err) => {
         if (err) {
             res.status(500).send('Error al descargar el archivo para Micasaya.');
+        } else {
+            // Elimina el archivo después de la descarga
+            fs.unlinkSync(file);
+            // Elimina el archivo 'archivo.txt' después de la descarga
+            const archivoTxtPath = __dirname + '/uploads/archivo.txt';
+            fs.unlinkSync(archivoTxtPath);
+
         }
     });
 });
@@ -122,10 +153,16 @@ app.get('/corvivienda', (req, res) => {
 // Ruta para procesar el archivo para Corvivienda
 app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => {
     try {
-        // Lee las cédulas desde el archivo subido
-        console.log('Ruta POST de Corvivienda iniciada.'); // Agregar esto
 
-        const lines = fs.readFileSync(__dirname + '/uploads/archivo.txt', 'utf-8').split('\n');
+
+        // Establece el nombre del archivo a 'archivo.txt'
+        const fileName = 'archivo.txt';
+        const filePath = __dirname + '/uploads/' + fileName;
+
+        // Mueve el archivo subido al nuevo nombre
+        fs.renameSync(req.file.path, filePath);
+
+        const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
         const cedulas = lines.map((line) => line.trim());
 
         // Inicia una instancia del navegador Playwright
@@ -188,6 +225,7 @@ app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => 
         // Cierra el navegador
         await browser.close();
 
+
         // Genera un enlace de descarga del archivo procesado
         const fileLink = '/corvivienda/descargar';
         res.send(`Archivo procesado correctamente para Corvivienda. <a href="${fileLink}" download>Descargar archivo</a>`);
@@ -202,6 +240,13 @@ app.get('/corvivienda/descargar', (req, res) => {
     res.download(file, 'DATOS_CORVIVIENDA.txt', (err) => {
         if (err) {
             res.status(500).send('Error al descargar el archivo para Corvivienda.');
+        } else {
+            // Elimina el archivo después de la descarga
+            fs.unlinkSync(file);
+            // Elimina el archivo 'archivo.txt' después de la descarga
+            const archivoTxtPath = __dirname + '/uploads/archivo.txt';
+            fs.unlinkSync(archivoTxtPath);
+
         }
     });
 });
