@@ -54,6 +54,8 @@ app.get('/micasaya', (req, res) => {
 // Ruta para procesar el archivo para Micasaya
 app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
     try {
+        console.time('procesamientoCedulas');
+
 
         // Establece el nombre del archivo a 'archivo.txt'
         const fileName = 'archivo.txt';
@@ -99,18 +101,24 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
                 // Verifica si la tabla que deseas procesar contiene un encabezado específico
                 const tabla = await page.$('.table-responsive table:has-text("ID del hogar")');
                 if (tabla) {
-                    // Obtiene las filas (tr) de la tabla
-                    const filasDeTabla = await tabla.$$eval('tr', (rows) => {
-                        return rows.map((row) => {
-                            return Array.from(row.querySelectorAll('td'), (cell) => cell.textContent).join(';');
+                    // Busca la fila que contiene la cédula específica
+                    const filaCedula = await tabla.$(`tr:has-text("${cedula}")`);
+                    if (filaCedula) {
+                        // Procesa la información de la fila encontrada
+                        const informacionFila = await filaCedula.$$eval('td', (cells) => {
+                            return cells.map((cell) => cell.textContent);
                         });
-                    });
-                    // Busca la clase 'text-start' en la página
-                    const contenidoTextStart = await page.$('.text-start');
-                    // Si existe la clase 'text-start', obtén su contenido
-                    const contenidoExtra = contenidoTextStart ? await contenidoTextStart.textContent() : '';
-                    const resultadoSinTitulo = informacionHogar.replace('Información del hogar:', '').replace('Estado:', '');
-                    fs.appendFileSync('DATOS_MICASAYA.txt', `${resultadoSinTitulo.trim()};${filasDeTabla.join(';')};${contenidoExtra}\n`, 'utf-8');
+        
+                        const contenidoTextStart = await page.$('.text-start');
+                        const contenidoExtra = contenidoTextStart ? await contenidoTextStart.textContent() : '';
+                        const resultadoSinTitulo = informacionHogar.replace('Información del hogar:', '').replace('Estado:', '');
+        
+                        fs.appendFileSync('DATOS_MICASAYA.txt', `${resultadoSinTitulo.trim()};${informacionFila.join(';')};${contenidoExtra}\n`, 'utf-8');
+                    } else {
+                        console.error(`No se encontró la cédula: ${cedula}`);
+                        // Si no se encuentra la cédula en ninguna fila de la tabla, agrega un mensaje de error
+                        fs.appendFileSync('DATOS_MICASAYA.txt', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;${cedula}\n`, 'utf-8');
+                    }
                 } else {
                     console.error(`No se encontró la tabla para la cédula: ${cedula}`);
                     // Si no se encuentra la tabla, agrega la cédula en el archivo con el mensaje de error
@@ -125,6 +133,7 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
 
         // Cierra el navegador
         await browser.close();
+        console.timeEnd('procesamientoCedulas');
 
 
 
