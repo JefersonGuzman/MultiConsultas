@@ -297,7 +297,7 @@ app.post('/sisben/procesar', upload.single('archivo'), async (req, res) => {
         });
 
         const browser = await chromium.launch({
-            headless: false, // Cambiar a true para ejecución sin interfaz gráfica
+            headless: true, // Cambiar a true para ejecución sin interfaz gráfica
         });
         const page = await browser.newPage();
         await page.goto('https://reportes.sisben.gov.co/dnp_sisbenconsulta');
@@ -413,8 +413,8 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
         // Ir a la página de TransUnion
         await page.goto('https://miportafolio.transunion.co/');
         // Ingresar las credenciales de inicio de sesión
-        await page.fill('input[name="Ecom_User_ID"]', '498281');
-        await page.fill('input[name="Ecom_Password"]', 'GNormandia7**');
+        await page.fill('input[name="Ecom_User_ID"]', '');
+        await page.fill('input[name="Ecom_Password"]', '');
         await page.click('#loginButton2');
         // Esperar a que se cargue la página después del inicio de sesión
         await page.waitForNavigation();
