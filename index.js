@@ -3,21 +3,16 @@ const ejs = require('ejs');
 const multer = require('multer');
 const fs = require('fs');
 const fse = require('fs-extra'); 
-
 const { chromium } = require('playwright');
-
 
 const app = express();
 const port = process.env.PORT || 3000;
-
 
 // Configuración de EJS como motor de plantillas
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
-
 const filePath = './uploads/archivo.txt';
-
 
 // Configuración de Multer para subir archivos
 const storage = multer.diskStorage({
@@ -29,22 +24,12 @@ const storage = multer.diskStorage({
     }
 });
 
-// try {
-//     fs.chmodSync(filePath, '0666');
-//     console.log('Se han concedido permisos de escritura al archivo.');
-//   } catch (error) {
-//     console.error('Error al conceder permisos de escritura:', error);
-//   }
-
-  
 const upload = multer({ storage: storage });
 
 // Ruta para mostrar el formulario para Micasaya
 app.get('/', (req, res) => {
     res.render('index');
 });
-
-
 
 // Ruta para mostrar el formulario para Micasaya
 app.get('/micasaya', (req, res) => {
@@ -81,7 +66,7 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
         }
 
         // Define las cabeceras
-        const cabeceras = ['Fecha Actualizacion','Estado', 'ID del hogar', 'Tipo de documento de identificación', 'Documento de identificación', 'Nombres y apellidos', 'Entidad', 'Fecha de postulación', 'Clasificación de Sisbén IV*', 'Resolución de asignación'];
+        const cabeceras = ['Estado', 'ID del hogar', 'Tipo de documento de identificación', 'Documento de identificación', 'Nombres y apellidos', 'Entidad', 'Fecha de postulación', 'Clasificación de Sisbén IV*', 'Resolución de asignación'];
 
         // Escribe las cabeceras en el archivo con punto y coma como separador
         fs.writeFileSync('DATOS_MICASAYA.txt', `${cabeceras.join(';')}\n`, 'utf-8');
@@ -108,15 +93,15 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
                         const informacionFila = await filaCedula.$$eval('td', (cells) => {
                             return cells.map((cell) => cell.textContent);
                         });
-                        const textoEtiqueta = await page.$eval('.text-muted', (element) => element.textContent.trim());
-                        const partes = textoEtiqueta.split(':');
-                        const fechaActualizacion = partes[1].trim();
+                        // const textoEtiqueta = await page.$eval('.text-muted', (element) => element.textContent.trim());
+                        // const partes = textoEtiqueta.split(':');
+                        // const fechaActualizacion = partes[1].trim();
 
                         const contenidoTextStart = await page.$('.text-start');
                         const contenidoExtra = contenidoTextStart ? await contenidoTextStart.textContent() : '';
                         const resultadoSinTitulo = informacionHogar.replace('Información del hogar:', '').replace('Estado:', '');
         
-                        fs.appendFileSync('DATOS_MICASAYA.txt', `${fechaActualizacion};${resultadoSinTitulo.trim()};${informacionFila.join(';')};${contenidoExtra}\n`, 'utf-8');
+                        fs.appendFileSync('DATOS_MICASAYA.txt', `${resultadoSinTitulo.trim()};${informacionFila.join(';')};${contenidoExtra}\n`, 'utf-8');
                     } else {
                         console.error(`No se encontró la cédula: ${cedula}`);
                         // Si no se encuentra la cédula en ninguna fila de la tabla, agrega un mensaje de error
@@ -323,37 +308,29 @@ app.post('/sisben/procesar', upload.single('archivo'), async (req, res) => {
 
             try {
 
-                    // Obtén todas las tablas con la clase '.col' en la página
-                    const tablas = await page.$$('.col');
-
-                    // Verifica si existe al menos una tabla
-                    if (tablas.length >= 2) {
-                        // Selecciona la segunda tabla (índice 1 en JavaScript)
-                        const segundaTabla = tablas[1];
-
-                        // Ahora puedes hacer lo que quieras con la segunda tabla
-                        const contenidoSegundaTabla = await segundaTabla.textContent();
-                        console.log(`Contenido de la segunda tabla:`);
-                        console.log(contenidoSegundaTabla);
-                    } else {
-                        console.error(`No se encontró una segunda tabla.`);
-                    }
-
+                // Obtén todas las tablas con la clase '.col' en la página
+                const tablas = await page.$$('.col');
+                // Verifica si existe al menos una tabla
+                if (tablas.length >= 2) {
+                    // Selecciona la segunda tabla (índice 1 en JavaScript)
+                    const segundaTabla = tablas[1];
+                    // Ahora puedes hacer lo que quieras con la segunda tabla
+                    const contenidoSegundaTabla = await segundaTabla.textContent();
+                    console.log(`Contenido de la segunda tabla:`);
+                    console.log(contenidoSegundaTabla);
+                } else {
+                    console.error(`No se encontró una segunda tabla.`);
+                }
                                             
             } catch (error) {
                 console.error(`Error al consultar la cédula: ${cedula}`);
                 fs.appendFileSync('DATOS_SISBEN.txt', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;${cedula}\n`, 'utf-8');
             }
-
-        
         }
         await browser.close();
-
         // Cierra el navegador
         // await browser.close();
         console.timeEnd('procesamientoCedulas');
-
-
 
         // Genera un enlace de descarga del archivo procesado
         const fileLink = '/sisben/descargar';
@@ -362,7 +339,6 @@ app.post('/sisben/procesar', upload.single('archivo'), async (req, res) => {
         res.status(500).send('Ocurrió un error al procesar el archivo para Sisben.');
     }
 });
-
 
 // Ruta para mostrar el formulario para transunion
 app.get('/transunion', (req, res) => {
@@ -479,7 +455,6 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
     }
 
 });
-
 
 app.listen(port, () => {
     console.log(`Servidor escuchando en http://localhost:${port}`);
