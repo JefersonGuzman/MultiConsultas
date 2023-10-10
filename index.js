@@ -70,7 +70,6 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
 
         // Escribe las cabeceras en el archivo con punto y coma como separador
         fs.writeFileSync('DATOS_MICASAYA.txt', `${cabeceras.join(';')}\n`, 'utf-8');
-
         for (const { tipoDocumento, cedula } of cedulas) {
             await page.goto('https://subsidiosfonvivienda.minvivienda.gov.co/micasaya/');
             await page.waitForSelector('select[name="tipo_documento"]');
@@ -456,5 +455,8 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Servidor escuchando en http://localhost:${port}`);
+    console.log('BIENVENIDO A CONSULTAS PLATAFORMAS')
+    console.log(`Ingrese a este URL en el Navegador`);
+    console.log(`http://localhost:${port}`)
+   
 });
