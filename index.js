@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Ruta para mostrar el formulario para Micasaya
+// Ruta para mostrar el Menu
 app.get('/', (req, res) => {
     res.render('index');
 });
@@ -238,7 +238,6 @@ app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => 
         res.status(500).send('Ocurrió un error al procesar el archivo para Corvivienda.');
     }
 });
-
 
 // Ruta para descargar el archivo procesado para Corvivienda
 app.get('/corvivienda/descargar', (req, res) => {
