@@ -6,6 +6,7 @@ npm install playwright
 npx playwright install
 
 
+
 ## Configuracion .bat ejecutable
 @echo off
 mode con: cols=40 lines=10

@@ -1,0 +1,19 @@
+## Definiremos que estos son los tipos de documentos que vamos a trabajar por defectos.
+
+ - [1] Cédula Ciudadana
+ - [2] Cédula de extranjera
+
+###### Sisben
+      - 3 Cédula de Ciudadanía
+      - 4 Cédula de Extranjería
+
+###### TransUnion
+      - 1 Cedula de Ciudadania
+      - 3 Cedula de Extranjeria
+
+###### Corvivienda
+      - No es necesario enviar el tipo de documento
+
+###### Mi Casa Ya
+      - 1 Cédula de Ciudadanía
+      - 2 Cédula de Extranjería
