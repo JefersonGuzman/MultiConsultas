@@ -39,11 +39,12 @@ app.get('/micasaya', (req, res) => {
 // Ruta para procesar el archivo para Micasaya
 app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
     try {
-        console.time('procesamientoCedulas');
+        console.time('procesamiento Cedulas');
         // Establece el nombre del archivo a 'archivo.txt'
         const fileName = 'archivo.txt';
         const filePath = __dirname + '/uploads/' + fileName;
 
+        console.log("cambiando nombre de archivo")
         // Mueve el archivo subido al nuevo nombre
         fs.renameSync(req.file.path, filePath);
 
@@ -53,27 +54,35 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
             const [tipoDocumento, cedula] = line.trim().split(';');
             return { tipoDocumento, cedula };
         });
+        console.log("Leer las cedulas")
+
 
         // Inicia una instancia del navegador Playwright
         const browser = await chromium.launch();
         const page = await browser.newPage();
+        console.log("Inicia una instancia del navegador Playwright")
 
         // Borra el archivo existente 'DATOS_MICASAYA.txt' si existe
         if (fs.existsSync('DATOS_MICASAYA.txt')) {
             fs.unlinkSync('DATOS_MICASAYA.txt');
         }
+        console.log("Borrando archivo si existe")
+
 
         // Define las cabeceras
         const cabeceras = ['Estado', 'ID del hogar', 'Tipo de documento de identificación', 'Documento de identificación', 'Nombres y apellidos', 'Entidad', 'Fecha de postulación', 'Clasificación de Sisbén IV*', 'Resolución de asignación'];
+        console.log("Definimos cabeceras")
 
         // Escribe las cabeceras en el archivo con punto y coma como separador
         fs.writeFileSync('DATOS_MICASAYA.txt', `${cabeceras.join(';')}\n`, 'utf-8');
         for (const { tipoDocumento, cedula } of cedulas) {
+            console.log("Iniciando el navegador")
             await page.goto('https://subsidiosfonvivienda.minvivienda.gov.co/micasaya/');
             await page.waitForSelector('select[name="tipo_documento"]');
             await page.selectOption('select[name="tipo_documento"]', tipoDocumento);
             await page.fill('input[name="numero_documento"]', cedula);
             await page.click('.btn-buscar');
+            console.log("Buscando usuarios")
 
             try {
                 // Espera a que aparezca la tabla dentro del div con clase 'table-responsive' con un tiempo límite de 30 segundos
