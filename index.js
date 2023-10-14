@@ -394,18 +394,18 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
         console.time('procesamientoDatos');
 
         // Establecer el nombre del archivo a 'archivo.txt'
-        const fileName = 'archivo.txt';
+        const fileName = 'archivo.csv';
         const filePath = __dirname + '/uploads/' + fileName;
         // Mover el archivo subido al nuevo nombre
         fs.renameSync(req.file.path, filePath);
         // Borrar el archivo existente 'DATOS_TRANSUNION.txt' si existe
-        if (fs.existsSync('DATOS_TRANSUNION.txt')) {
-            fs.unlinkSync('DATOS_TRANSUNION.txt');
+        if (fs.existsSync('DATOS_TRANSUNION.csv')) {
+            fs.unlinkSync('DATOS_TRANSUNION.csv');
         }
         // Definir las cabeceras
-        const cabeceras = ['CEDULA', 'CÓDIGO FAMILIA', 'RESULTADO MI CASA YA', 'Número de reserva FRECH'];
+        const cabeceras = ['CEDULA', 'CODIGO FAMILIA', 'RESULTADO MI CASA YA', 'NUMERO DE RESERVA FRECH','CONSULTA'];
         // Escribir las cabeceras en el archivo con punto y coma como separador
-        fs.writeFileSync('DATOS_TRANSUNION.txt', `${cabeceras.join(';')}\n`, 'utf-8');
+        fs.writeFileSync('DATOS_TRANSUNION.csv', `${cabeceras.join(';')}\n`, 'utf-8');
         // Leer los datos del archivo y separar por líneas
         const cedulas = fs.readFileSync(filePath, 'utf-8').split('\n');
         // Iniciar una instancia del navegador Playwright
@@ -428,7 +428,7 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
             const [tipoDocumento, numIdentificacion] = cedula.trim().split(';');
 
             let tipoDocumentoVerificado = tipoDocumento;
-            if (tipoDocumento === '1') {
+            if (tipoDocumento === '3') {
                 tipoDocumentoVerificado = '1';
             } else if (tipoDocumento === '2') {
                 tipoDocumentoVerificado = '3';
@@ -439,18 +439,27 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
             await page.fill('input[name="form1:numIdentificacion"]', numIdentificacion);
             // Hacer clic en un botón o enviar el formulario
             await page.click('input[type="submit"]');
+            await page.waitForLoadState('load');
+            const modal = await page.evaluate(
+                () =>
+                    document.querySelector(
+                        "#popup_ok"
+                    )
+            );
+            if (modal) {
+                fs.appendFileSync('DATOS_TRANSUNION.csv', `${numIdentificacion};;;\n`, 'utf-8');
 
-
-            try{
+                await page.click('#popup_ok');
+            }else{
                 const tableSelectorTimeout = 3000; // 5 segundos de tiempo de espera para el selector
                 await Promise.race([
                     page.waitForSelector('table#hogaresConsultados', { timeout: tableSelectorTimeout }),
                     page.waitForTimeout(tableSelectorTimeout)
                 ]);
-
+    
                 await page.waitForSelector('table#hogaresConsultados');
                 await page.goto('https://miportafolio.transunion.co/cifin/MiCasaYa/consultaConstructor/faces/pagos?destino=consultaHogar');
-        
+    
                 await page.evaluate(() => {
                     const botonVer = document.querySelector('input[name="hogaresConsultados:0:_id31"]');
                     if (botonVer) {
@@ -482,30 +491,13 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
                     // Formatear los datos separados por punto y coma
                     const datosFormateados = filas.join(';');
                     // Guardar los datos en el archivo DATOS_TRANSUNION.txt
-                    fs.appendFileSync('DATOS_TRANSUNION.txt', `${numIdentificacion};${datosFormateados}\n`, 'utf-8');
+                    fs.appendFileSync('DATOS_TRANSUNION.csv', `${numIdentificacion};${datosFormateados}\n`, 'utf-8');
                     // Navegar a la página deseada después del inicio de sesión
                     await page.goto('https://miportafolio.transunion.co/cifin/MiCasaYa/consultaConstructor/faces/pagos?destino=consultaHogar');
                 }
-            
-            }catch(error){
-                // Si no se encuentra la tabla, guardar un mensaje en el archivo
-                fs.appendFileSync('DATOS_TRANSUNION.txt', `${numIdentificacion};Esta cédula no se encontró en la plataforma.\n`, 'utf-8');
-                console.log('buscando Numero de identidad')
-                await page.fill('input[name="form1:numIdentificacion"]','');
-                await page.waitForSelector('a[title="[498281]-Cerrar sesión"]');
-                await page.click('a[title="[498281]-Cerrar sesión"]');
-                await page.goto('https://miportafolio.transunion.co/');
-                // Ingresar las credenciales de inicio de sesión
-                await page.fill('input[name="Ecom_User_ID"]', '498281');
-                await page.fill('input[name="Ecom_Password"]', 'GNormandia7**');
-                await page.click('#loginButton2');
-                // Esperar a que se cargue la página después del inicio de sesión
-                await page.waitForNavigation();
-                // Navegar a la página deseada después del inicio de sesión
-                await page.goto('https://miportafolio.transunion.co/cifin/MiCasaYa/consultaConstructor/faces/pagos?destino=consultaHogar');
             }
 
-             
+
 
         }
 
@@ -520,7 +512,6 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
     } catch (error) {
         // await page.click('a[title="[498281]-Cerrar sesión"]');
         // await page.goto('https://miportafolio.transunion.co/');
-
         res.status(500).send('Ocurrió un error al procesar el archivo para transUnion.');
         // Cierra el navegador
     }
@@ -528,8 +519,5 @@ app.post('/transunion/procesar', upload.single('archivo'), async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log('BIENVENIDO A CONSULTAS PLATAFORMAS')
-    console.log(`Ingrese a este URL en el Navegador`);
     console.log(`http://localhost:${port}`)
-
 });
