@@ -244,7 +244,7 @@ app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => 
         await browser.close();
         // Genera un enlace de descarga del archivo procesado
         const fileLink = '/corvivienda/descargar';
-        res.send(`<div>Archivo procesado correctamente para Corvivienda.</div> <a style="color: #000;background-color: #31d2f2;border-color: #25cff2;padding: 0.5rem;font-weight: 700;text-transform: uppercase;text-decoration: none;border-radius: 0.5rem;" href="${fileLink}" download>Descargar archivo</a>`);
+        res.send(`<div style="margin: 1rem 1rem 1rem 0rem;width: 350px;text-align: center;font-weight: 700;text-transform: uppercase;background-color: #1379cc;padding: 1rem;color: #fff;border-radius: 10px;">Archivo procesado correctamente para Corvivienda.</div> <a style="color: #000;background-color: #31d2f2;border-color: #25cff2;padding: 0.5rem;font-weight: 700;text-transform: uppercase;text-decoration: none;border-radius: 0.5rem;" href="${fileLink}" download>Descargar archivo</a>`);
     } catch (error) {
         res.status(500).send('Ocurrió un error al procesar el archivo para Corvivienda.');
     }
