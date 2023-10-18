@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000;
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
-const filePath = './uploads/archivo.txt';
+const filePath = './uploads/archivo.csv';
 
 // Configuración de Multer para subir archivos
 const storage = multer.diskStorage({
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
         cb(null, __dirname + '/uploads');
     },
     filename: (req, file, cb) => {
-        cb(null, 'archivo.txt');
+        cb(null, 'archivo.csv');
     }
 });
 
@@ -41,7 +41,7 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
     try {
         console.time('procesamiento Cedulas');
         // Establece el nombre del archivo a 'archivo.txt'
-        const fileName = 'archivo.txt';
+        const fileName = 'archivo.csv';
         const filePath = __dirname + '/uploads/' + fileName;
 
         console.log("cambiando nombre de archivo")
@@ -54,7 +54,7 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
             const [tipoDocumento, cedula] = line.trim().split(';');
             return { tipoDocumento, cedula };
         });
-        console.log("Leer las cedulas")
+        const cantidadFilas = cedulas.length;
 
 
         // Inicia una instancia del navegador Playwright
@@ -62,20 +62,22 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
         const page = await browser.newPage();
         console.log("Inicia una instancia del navegador Playwright")
 
-        // Borra el archivo existente 'DATOS_MICASAYA.txt' si existe
-        if (fs.existsSync('DATOS_MICASAYA.txt')) {
-            fs.unlinkSync('DATOS_MICASAYA.txt');
+        // Borra el archivo existente 'DATOS_MICASAYA.csv' si existe
+        if (fs.existsSync('DATOS_MICASAYA.csv')) {
+            fs.unlinkSync('DATOS_MICASAYA.csv');
         }
         console.log("Borrando archivo si existe")
 
 
         // Define las cabeceras
         const cabeceras = ['Estado', 'ID del hogar', 'Tipo de documento de identificación', 'Documento de identificación', 'Nombres y apellidos', 'Entidad', 'Fecha de postulación', 'Clasificación de Sisbén IV*', 'Resolución de asignación'];
-        console.log("Definimos cabeceras")
+        console.log(cantidadFilas)
 
         // Escribe las cabeceras en el archivo con punto y coma como separador
-        fs.writeFileSync('DATOS_MICASAYA.txt', `${cabeceras.join(';')}\n`, 'utf-8');
+        fs.writeFileSync('DATOS_MICASAYA.csv', `${cabeceras.join(';')}\n`, 'utf-8');
+        let datos = 0
         for (const { tipoDocumento, cedula } of cedulas) {
+            
             console.log("Iniciando el navegador")
             await page.goto('https://subsidiosfonvivienda.minvivienda.gov.co/micasaya/');
             await page.waitForSelector('select[name="tipo_documento"]');
@@ -92,6 +94,7 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
                 // Verifica si la tabla que deseas procesar contiene un encabezado específico
                 const tabla = await page.$('.table-responsive table:has-text("ID del hogar")');
                 if (tabla) {
+
                     // Busca la fila que contiene la cédula específica
                     const filaCedula = await tabla.$(`tr:has-text("${cedula}")`);
                     if (filaCedula) {
@@ -107,33 +110,36 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
                         const contenidoExtra = contenidoTextStart ? await contenidoTextStart.textContent() : '';
                         const resultadoSinTitulo = informacionHogar.replace('Información del hogar:', '').replace('Estado:', '');
 
-                        fs.appendFileSync('DATOS_MICASAYA.txt', `${resultadoSinTitulo.trim()};${informacionFila.join(';')};${contenidoExtra}\n`, 'utf-8');
+                        fs.appendFileSync('DATOS_MICASAYA.csv', `${resultadoSinTitulo.trim()};${informacionFila.join(';')};${contenidoExtra}\n`, 'utf-8');
                     } else {
                         console.error(`No se encontró la cédula: ${cedula}`);
                         // Si no se encuentra la cédula en ninguna fila de la tabla, agrega un mensaje de error
-                        fs.appendFileSync('DATOS_MICASAYA.txt', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;${cedula}\n`, 'utf-8');
+                        fs.appendFileSync('DATOS_MICASAYA.csv', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;${cedula}\n`, 'utf-8');
                     }
+
                 } else {
                     console.error(`No se encontró la tabla para la cédula: ${cedula}`);
                     // Si no se encuentra la tabla, agrega la cédula en el archivo con el mensaje de error
-                    fs.appendFileSync('DATOS_MICASAYA.txt', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;;${cedula}\n`, 'utf-8');
+                    fs.appendFileSync('DATOS_MICASAYA.csv', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;;${cedula}\n`, 'utf-8');
                 }
             } catch (error) {
                 // En caso de TimeoutError o cualquier otro error, muestra la cédula y agrega el mensaje de error
                 console.error(`Error al consultar la cédula: ${cedula}`);
-                fs.appendFileSync('DATOS_MICASAYA.txt', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;${cedula}\n`, 'utf-8');
+                fs.appendFileSync('DATOS_MICASAYA.csv', `NO SE ENCONTRÓ REGISTRO, VERIFICA MANUALMENTE;;${cedula}\n`, 'utf-8');
             }
+            datos++;
+
         }
 
+        console.log(datos)
         // Cierra el navegador
         await browser.close();
-
-
 
         // Genera un enlace de descarga del archivo procesado
         const fileLink = '/micasaya/descargar';
         res.send(`<div style="margin: 1rem 1rem 1rem 0rem;width: 350px;text-align: center;font-weight: 700;text-transform: uppercase;background-color: #1379cc;padding: 1rem;color: #fff;border-radius: 10px;">
         Archivo procesado correctamente para Micasaya.</div> <a  style="width: 350px;color: #fff;background-color: #31d2f2;border-color: #25cff2;padding: 0.5rem;font-weight: 700;text-transform: uppercase;text-decoration: none;border-radius: 0.5rem;" href="${fileLink}" download>Descargar archivo</a>`);
+
     } catch (error) {
         res.status(500).send('Ocurrió un error al procesar el archivo para Micasaya.');
     }
@@ -141,15 +147,15 @@ app.post('/micasaya/procesar', upload.single('archivo'), async (req, res) => {
 
 // Ruta para descargar el archivo procesado para Micasaya
 app.get('/micasaya/descargar', (req, res) => {
-    const file = __dirname + '/DATOS_MICASAYA.txt';
-    res.download(file, 'DATOS_MICASAYA.txt', (err) => {
+    const file = __dirname + '/DATOS_MICASAYA.csv';
+    res.download(file, 'DATOS_MICASAYA.csv', (err) => {
         if (err) {
             res.status(500).send('Error al descargar el archivo para Micasaya.');
         } else {
             // Elimina el archivo después de la descarga
             fs.unlinkSync(file);
-            // Elimina el archivo 'archivo.txt' después de la descarga
-            const archivoTxtPath = __dirname + '/uploads/archivo.txt';
+            // Elimina el archivo 'archivo.csv' después de la descarga
+            const archivoTxtPath = __dirname + '/uploads/archivo.csv';
             fs.unlinkSync(archivoTxtPath);
 
         }
@@ -163,11 +169,12 @@ app.get('/micasaya/descargar', (req, res) => {
 
 // Ruta para procesar el archivo para Corvivienda
 app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => {
+    console.time('procesamientoDatos');
+
     try {
 
-
         // Establece el nombre del archivo a 'archivo.txt'
-        const fileName = 'archivo.txt';
+        const fileName = 'archivo.csv';
         const filePath = __dirname + '/uploads/' + fileName;
 
         // Mueve el archivo subido al nuevo nombre
@@ -175,21 +182,21 @@ app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => 
 
         const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
         const cedulas = lines.map((line) => line.trim());
-
+        console.log(cedulas.length)
         // Inicia una instancia del navegador Playwright
         const browser = await chromium.launch();
         const page = await browser.newPage();
 
-        // Borra el archivo existente 'DATOS_CORVIVIENDA.txt' si existe
-        if (fs.existsSync('DATOS_CORVIVIENDA.txt')) {
-            fs.unlinkSync('DATOS_CORVIVIENDA.txt');
+        // Borra el archivo existente 'DATOS_CORVIVIENDA.csv' si existe
+        if (fs.existsSync('DATOS_CORVIVIENDA.csv')) {
+            fs.unlinkSync('DATOS_CORVIVIENDA.csv');
         }
 
         // Define las cabeceras
         const cabeceras = ['CEDULA DE CIUDADANIA', 'SISBEN IV', 'VICTIMA', 'DAMNIFICADO', 'CORVIVIENDA', 'ESTADO'];
 
         // Escribe las cabeceras en el archivo con punto y coma como separador
-        fs.writeFileSync('DATOS_CORVIVIENDA.txt', `${cabeceras.join(';')}\n`, 'utf-8');
+        fs.writeFileSync('DATOS_CORVIVIENDA.csv', `${cabeceras.join(';')}\n`, 'utf-8');
 
         for (const cedula of cedulas) {
             await page.goto('https://corvivienda.gov.co/app/validador_MiCasaYa/');
@@ -212,7 +219,7 @@ app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => 
 
                 // Verifica si la tabla contiene el número esperado de columnas
                 if (rowData.length === cabeceras.length) {
-                    fs.appendFileSync('DATOS_CORVIVIENDA.txt', `${rowData.join(';')}\n`, 'utf-8');
+                    fs.appendFileSync('DATOS_CORVIVIENDA.csv', `${rowData.join(';')}\n`, 'utf-8');
                 } else {
                     console.error(`Datos inválidos para la cédula: ${cedula}`);
                 }
@@ -226,7 +233,7 @@ app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => 
                     // Reemplazar saltos de línea con espacios en blanco
                     errorText = errorText.replace(/\n/g, ' ');
                     // Si existe, usar el contenido como estado
-                    fs.appendFileSync('DATOS_CORVIVIENDA.txt', `${cedula};;;;;${errorText}\n`, 'utf-8');
+                    fs.appendFileSync('DATOS_CORVIVIENDA.csv', `${cedula};;;;;${errorText}\n`, 'utf-8');
                 } else {
                     res.status(500).send(`Ocurrió un error al procesar cédulas para Corvivienda: ${error.message}`);
                 }
@@ -245,15 +252,15 @@ app.post('/corvivienda/procesar', upload.single('archivo'), async (req, res) => 
 
 // Ruta para descargar el archivo procesado para Corvivienda
 app.get('/corvivienda/descargar', (req, res) => {
-    const file = __dirname + '/DATOS_CORVIVIENDA.txt';
-    res.download(file, 'DATOS_CORVIVIENDA.txt', (err) => {
+    const file = __dirname + '/DATOS_CORVIVIENDA.csv';
+    res.download(file, 'DATOS_CORVIVIENDA.csv', (err) => {
         if (err) {
             res.status(500).send('Error al descargar el archivo para Corvivienda.');
         } else {
             // Elimina el archivo después de la descarga
             fs.unlinkSync(file);
             // Elimina el archivo 'archivo.txt' después de la descarga
-            const archivoTxtPath = __dirname + '/uploads/archivo.txt';
+            const archivoTxtPath = __dirname + '/uploads/archivo.csv';
             fs.unlinkSync(archivoTxtPath);
 
         }
