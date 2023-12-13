@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    <title>Consultar Plataforma</title>
+    <title>MultiConsultas | Constructora Normandia</title>
 </head>
 <style>
     .form{
@@ -49,75 +49,128 @@
 <body>
 
     <div class="container">
-        <div class="row col-6" style="margin: 0 auto">
-            <div class="col-sm-12 col-lg-12" style="text-align: center;background-color: #3ab4a6;color: #fff; margin-top: 1rem;border-radius: 10px 10px 0px 0px;padding: 0.5re">
-                <h6>Plataformas para consultar</h6>
-            </div>
-            <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 1rem;">
-                <div class="element">MI CASA YA </div>
-                <form action="/micasaya/procesar" method="post" enctype="multipart/form-data">
-                    <div class="container"style="background-color: #aaafb3;padding: 1rem;border-radius: 10px;">
-                        <div class="row">
-                            <div class="col-sm-8 col-md-8">
-                                <input class="form-control" type="file" name="archivo" required>
+        <div class="row" style="margin: 0 auto">
+            <div class="col-12">
+                <div class="col-sm-12 col-lg-12" style="text-align: center;background-color: #3ab4a6;color: #fff; margin-top: 1rem;border-radius: 10px 10px 0px 0px;padding: 0.5re">
+                    <h6>Plataformas para consultar</h6>
+                </div>
+                <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 1rem;">
+                    <div class="row">
+                        <div class="col-6">
+                            <img src="https://constructoranormandia.com/wp-content/uploads/2022/01/logo-constructora-normandia-normal.png" alt="">
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="element">MI CASA YA </div>
+                            <form action="/micasaya/procesar" method="post" enctype="multipart/form-data" onsubmit="showProcessingMessage('micasaya-processing')">
+                                <div class="container"style="background-color: #aaafb3;padding: 1rem;border-radius: 10px;">
+                                    <div class="row">
+                                        <div class="col-sm-8 col-md-8">
+                                            <input class="form-control" type="file" name="archivo" required>
+                                        </div>
+                                        <div class="col-sm-4 col-md-4">
+                                            <button class="btn btn-info" type="submit" >CONSULTAR</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-5">
+                                    <div id="micasaya-processing" style="display: none; color: blue;">Procesando información...</div>
+                                </div>
+                                <div class="col-7" id="proceso-ini">
+                                    <span id="micasaya-proceso-ini-text"></span>
+                                </div>
                             </div>
-                            <div class="col-sm-4 col-md-4">
-                                <button class="btn btn-info" type="submit">CONSULTAR</button>
+                            <div class="row">
+                                <div class="col-8 cont-bar">
+                                    <progress id="micasaya-bar" style="width: 100%;padding: 2rem;" value="0" max="100"></progress>
+                                </div>
+                                <div class="col-4" style="padding: 1rem;text-align: center;font-weight: 700;">
+                                    <span id="micasaya-progress-text">0%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 1rem;">
-                <div class="element">Corvivienda</div>
-                <form action="/corvivienda/procesar" method="post" enctype="multipart/form-data">
-                    <div class="container"style="background-color: #aaafb3;padding: 1rem;border-radius: 10px;">
-                        <div class="row">
-                            <div class="col-sm-8 col-md-8">
-                                <input class="form-control" type="file" name="archivo" required>
+                </div>
+    
+                <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 1rem;">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="element">Corvivienda</div>
+                            <form action="/corvivienda/procesar" method="post" enctype="multipart/form-data" onsubmit="showProcessingMessage('corvivienda-processing')">
+                                <div class="container"style="background-color: #aaafb3;padding: 1rem;border-radius: 10px;">
+                                    <div class="row">
+                                        <div class="col-sm-8 col-md-8">
+                                            <input class="form-control" type="file" name="archivo" required>
+                                        </div>
+                                        <div class="col-sm-4 col-md-4">
+                                            <button class="btn btn-info" type="submit">CONSULTAR</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-5">
+                                    <div id="corvivienda-processing" style="display: none; color: blue;">Procesando información...</div>
+                                </div>
+                                <div class="col-7" id="proceso-ini">
+                                    <span id="corvivienda-proceso-ini-text"></span>
+                                </div>
                             </div>
-                            <div class="col-sm-4 col-md-4">
-                                <button class="btn btn-info" type="submit">CONSULTAR</button>
+                            <div class="row">
+                                <div class="col-8 cont-bar">
+                                    <progress class="" id="corvivienda-bar" style="width: 100%;padding: 2rem;" value="0" max="100"></progress>
+                                </div>
+                                <div class="col-4" style="padding: 1rem;text-align: center;font-weight: 700;">
+                                    <span id="corvivienda-progress-text">0%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
-            <!-- <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 0.4rem;">
-                <div class="element">TransUnion</div>
-                <form action="/transUnion/procesar" method="post" enctype="multipart/form-data">
-                    <div class="container"style="background-color: #aaafb3;padding: 0.5rem;border-radius: 10px;">
-                        <div class="row">
-                            <div class="col-sm-8 col-md-8">
-                                <input class="form-control" type="file" name="archivo" required>
-                            </div>
-                            <div class="col-sm-4 col-md-4">
-                                <button class="btn btn-info" type="submit">CONSULTAR</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 0.4rem;">
-                <div class="element">Sisben</div>
-                <form action="/sisben/procesar" method="post" enctype="multipart/form-data">
-                    <div class="container"style="background-color: #aaafb3;padding: 0.5rem;border-radius: 10px;">
-                        <div class="row">
-                            <div class="col-sm-8 col-md-8">
-                                <input class="form-control" type="file" name="archivo" required>
-                            </div>
-                            <div class="col-sm-4 col-md-4">
-                                <button class="btn btn-info" type="submit">CONSULTAR</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div> -->
-            <div class="col-sm-12 col-lg-12" style="text-align: center;background-color: #3ab4a6;color: #fff; border-radius: 0px 0px 10px 10px;padding: 0.5re">
-                <h6>...</h6>
+                </div>
+                <div class="col-sm-12 col-lg-12" style="text-align: center;background-color: #3ab4a6;color: #fff; border-radius: 0px 0px 10px 10px;padding: 0.5re">
+                    <h6>...</h6>
+                </div>
             </div>
         </div>
     </div>
+
+ 
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        function showProcessingMessage(processingElementId) {
+            // Muestra el mensaje de procesamiento cuando se envía el formulario
+            document.getElementById(processingElementId).style.display = 'block';
+        }
+        socket.on('micasaya-progress', (progress,cantCedula) => {
+            document.getElementById('micasaya-bar').value = progress;
+            document.getElementById('micasaya-proceso-ini-text').innerText = `¡Has cargado ( ${cantCedula} ) cédulas para consultar!`;
+            document.getElementById('micasaya-progress-text').innerText = `${progress}%`;
+        });
+
+
+        socket.on('corvivienda-progress', (progress,cantCedula) => {
+            document.getElementById('corvivienda-bar').value = progress;
+            document.getElementById('corvivienda-proceso-ini-text').innerText = `¡Has cargado ( ${cantCedula} ) cédulas para consultar!`;
+            document.getElementById('corvivienda-progress-text').innerText = `${progress}%`;
+        });
+
+
+
+    </script>
+
+    
 
 
 </body>

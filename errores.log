@@ -1,0 +1,8 @@
+2023-12-12T18:02:18.038Z: browserType.launch: Failed to launch chromium because executable doesn't exist at C:Program FilesGoogleChromeApplication/chrome.exe
+    at C:\Users\Windows\Desktop\APP-MODIFICADO\MultiConsultas\index.js:94:40
+    at Layer.handle [as handle_request] (C:\Users\Windows\Desktop\APP-MODIFICADO\MultiConsultas\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\Users\Windows\Desktop\APP-MODIFICADO\MultiConsultas\node_modules\express\lib\router\route.js:144:13)
+    at done (C:\Users\Windows\Desktop\APP-MODIFICADO\MultiConsultas\node_modules\multer\lib\make-middleware.js:45:7)
+    at indicateDone (C:\Users\Windows\Desktop\APP-MODIFICADO\MultiConsultas\node_modules\multer\lib\make-middleware.js:49:68)
+    at C:\Users\Windows\Desktop\APP-MODIFICADO\MultiConsultas\node_modules\multer\lib\make-middleware.js:155:11
+    at WriteStream.<anonymous> (C:\Users\Windows\Desktop\APP-MODIFICADO\MultiConsultas\node_modules\multer\storage\disk.js:43:9)
