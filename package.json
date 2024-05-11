@@ -12,7 +12,7 @@
     "electron-builder": "^24.9.1",
     "electron-packager": "^17.1.2"
   },
-  "name": "multi_busquedas",
+  "name": "app_plataforma",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   "license": "ISC",
   "description": "Plataforma para la automatización de consultas a plataformas como Sisben y Mi Casa Ya",
   "build": {
-    "productName": "multi_consultas",
+    "productName": "AppPlataforma",
     "appId": "08122023.0.001",
     "directories": {
       "output": "dist"
