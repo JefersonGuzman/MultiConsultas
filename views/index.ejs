@@ -35,6 +35,8 @@
         text-align: center;
         border-radius: 5px;
         margin: 0.2rem;
+        display: flex;
+        justify-content: space-between;
     }
 
     .element:hover{
@@ -45,25 +47,43 @@
         font-weight: 700 !important;
     }
 
+    .titulo{
+        font-family: monospace;
+        text-transform: uppercase;
+        font-size: 20px;
+    }
+
+    .logo{
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 7px;
+        align-content: center;
+    }
+
 </style>
 <body>
 
     <div class="container">
         <div class="row" style="margin: 0 auto">
             <div class="col-12">
-                <div class="col-sm-12 col-lg-12" style="text-align: center;background-color: #3ab4a6;color: #fff; margin-top: 1rem;border-radius: 10px 10px 0px 0px;padding: 0.5re">
+                <div class="col-sm-12 col-lg-12" style="margin-bottom: -0.5rem;text-align: center;background-color: #2266ef;color: #fff; margin-top: 1rem;border-radius: 10px 10px 0px 0px;padding: 0.5re">
                     <h6>Plataformas para consultar</h6>
                 </div>
                 <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 1rem;">
                     <div class="row">
                         <div class="col-6">
-                            <img src="https://constructoranormandia.com/wp-content/uploads/2022/01/logo-constructora-normandia-normal.png" alt="">
-                        </div>
-                    </div>
-                    <hr/>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="element">MI CASA YA </div>
+                            <div class="element">
+                                <div class="logo">
+                                    <img src="https://acfsas.co/wp-content/uploads/2023/07/micasayaLOGORecurso-3.png" width="40px" alt="">
+                                </div>
+                                <div class="">
+                                    <img src="https://jeff-innova.com/img/descargas/PortalWeb.png" style="width: 100%; height: 50px;"  alt="">
+                                </div>
+                                
+                                <div class="logo">
+                                    <img src="https://www.minvivienda.gov.co/themes/custom/minvivienda/images/LOGO-VIVIENDA.png" width="40px" alt="">
+                                </div>                                
+                            </div>
                             <form action="/micasaya/procesar" method="post" enctype="multipart/form-data" onsubmit="showProcessingMessage('micasaya-processing')">
                                 <div class="container"style="background-color: #aaafb3;padding: 1rem;border-radius: 10px;">
                                     <div class="row">
@@ -101,7 +121,18 @@
                 <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 1rem;">
                     <div class="row">
                         <div class="col-6">
-                            <div class="element">Corvivienda</div>
+                            <div class="element">
+                                <div class="logo">
+                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZtbws5x9386OISSQTu6LOSHUZ4TbQLnMDPn_lHs4jWw&s" width="40px" alt="">
+                                </div>
+                                <div class="">
+                                    <img src="https://jeff-innova.com/img/descargas/PortalWeb.png" style="width: 100%; height: 50px;"  alt="">
+                                </div>
+                                
+                                <div class="logo">
+                                    <img src="https://www.minvivienda.gov.co/themes/custom/minvivienda/images/LOGO-VIVIENDA.png" width="40px" alt="">
+                                </div>  
+                            </div>
                             <form action="/corvivienda/procesar" method="post" enctype="multipart/form-data" onsubmit="showProcessingMessage('corvivienda-processing')">
                                 <div class="container"style="background-color: #aaafb3;padding: 1rem;border-radius: 10px;">
                                     <div class="row">
@@ -135,7 +166,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-12 col-lg-12" style="text-align: center;background-color: #3ab4a6;color: #fff; border-radius: 0px 0px 10px 10px;padding: 0.5re">
+
+                <div class="col-sm-12 col-md-12" style="text-align: center;background-color: #e0dede;padding: 1rem;">
+                    <div class="row">
+                        <div class="col-6">
+                            <img src="https://www.logogenio.es/icons/preview/10841" style="margin-top: 4rem;" width="200px" alt="">
+                        </div>
+                        <div class="col-6">
+                            <h3 class="titulo">Listado para Descargar</h3>
+                            <iframe src="https://jeff-innova.com/descargas.php" style="width: 100%;" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>  
+
+                <div class="col-sm-12 col-lg-12" style="text-align: center;background-color: #2266ef;color: #fff; border-radius: 0px 0px 10px 10px;padding: 0.5re">
                     <h6>...</h6>
                 </div>
             </div>
