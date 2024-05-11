@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "electron": "^16.0.2",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "electron-packager": "^17.1.2"
   },
   "name": "multi_busquedas",
   "version": "1.0.0",
